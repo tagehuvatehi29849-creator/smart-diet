@@ -1,0 +1,89 @@
+spring:
+  application:
+    name: smart-diet
+  profiles:
+    active: prod
+  # 手动排除 PgVector 自动配置，由 PgVectorStoreConfig 手动注册 Bean
+  autoconfigure:
+    exclude: org.springframework.ai.autoconfigure.vectorstore.pgvector.PgVectorStoreAutoConfiguration
+  # Redis 配置（连接参数、密码等在 local profile 中覆盖）
+  data:
+    redis:
+      database: 0
+      host: 127.0.0.1
+      port: 6379
+      timeout: 5000ms
+      lettuce:
+        pool:
+          min-idle: 1
+          max-idle: 8
+          max-active: 16
+  # MCP（暂不启用）
+  #  ai:
+  #    mcp:
+  #      client:
+  #        sse:
+  #          connections:
+  #            server1:
+  #              url: http://localhost:8127
+
+server:
+  port: 8133
+  servlet:
+    context-path: /api
+
+# ==========================================
+# Knife4j / SpringDoc OpenAPI
+# ==========================================
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan: com.hzy.smartdiet.controller
+
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+
+# ==========================================
+# MyBatis-Plus 配置
+# ==========================================
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-aliases-package: com.hzy.smartdiet.model.entity
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    default-enum-type-handler: org.apache.ibatis.type.EnumOrdinalTypeHandler
+
+# ==========================================
+# 应用自定义配置
+# ==========================================
+app:
+  rag:
+    dataloader:
+      # true = 首次启动时向 PgVector 加载知识库；正常运行时设为 false
+      enabled: false
+  chat:
+    context:
+      # 保留最近 N 轮对话（1轮 = 1条 user + 1条 assistant）
+      max-turns: 5
+      # Redis Key TTL，单位秒（默认 24 小时）
+      ttl-seconds: 86400
+  baidu-translate:
+    app-id: "your_baidu_appid"
+    secret-key: "your_baidu_secret_key"
+    api-url: "https://fanyi-api.baidu.com/api/trans/vip/translate"

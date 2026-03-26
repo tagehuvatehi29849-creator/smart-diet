@@ -1,0 +1,130 @@
+/* ============================================================
+   全局样式 — 智能饮食管理助手
+   ============================================================ */
+
+:root {
+  --color-primary: #42b883;
+  --color-primary-dark: #33a06f;
+  --color-primary-light: #e8f8f0;
+  --color-accent: #ff8c42;
+  --color-danger: #f56c6c;
+  --color-warning: #e6a23c;
+  --color-bg: #f0f4f8;
+  --color-card: #ffffff;
+  --color-text: #2c3e50;
+  --color-text-muted: #8a9ab0;
+  --color-border: #e4e9f0;
+  --sidebar-width: 240px;
+  --radius: 12px;
+  --shadow: 0 2px 16px rgba(0,0,0,0.06);
+  --shadow-hover: 0 8px 32px rgba(66,184,131,0.18);
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 14px; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ---- 滚动条美化 ---- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c8d3e0; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #a0afbe; }
+
+/* ---- Element Plus 覆盖 ---- */
+.el-button--primary {
+  --el-button-bg-color: var(--color-primary) !important;
+  --el-button-border-color: var(--color-primary) !important;
+  --el-button-hover-bg-color: var(--color-primary-dark) !important;
+  --el-button-hover-border-color: var(--color-primary-dark) !important;
+}
+
+.el-tag--success {
+  --el-tag-bg-color: var(--color-primary-light) !important;
+  --el-tag-text-color: var(--color-primary-dark) !important;
+}
+
+/* ---- 通用卡片 ---- */
+.card {
+  background: var(--color-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  transition: var(--transition);
+}
+.card:hover { box-shadow: var(--shadow-hover); }
+
+/* ---- 渐变文字 ---- */
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-primary), #00c9a7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ---- 动画 ---- */
+.fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+
+.slide-up-enter-active { transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+.slide-up-enter-from { opacity: 0; transform: translateY(20px); }
+
+/* ---- Markdown 渲染样式 ---- */
+.md-content h1, .md-content h2, .md-content h3 {
+  margin: 12px 0 6px;
+  color: var(--color-text);
+}
+.md-content p { margin-bottom: 8px; }
+.md-content ul, .md-content ol { padding-left: 20px; margin-bottom: 8px; }
+.md-content li { margin-bottom: 4px; }
+.md-content code {
+  background: #f0f4f8;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.9em;
+}
+.md-content pre {
+  background: #1e2a3a;
+  color: #e2e8f0;
+  padding: 14px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 8px 0;
+}
+.md-content pre code { background: none; padding: 0; color: inherit; }
+.md-content blockquote {
+  border-left: 3px solid var(--color-primary);
+  padding-left: 12px;
+  color: var(--color-text-muted);
+  margin: 8px 0;
+}
+.md-content table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+.md-content th, .md-content td {
+  border: 1px solid var(--color-border);
+  padding: 6px 12px;
+  text-align: left;
+}
+.md-content th { background: var(--color-primary-light); }
+
+/* ---- 打字光标动画 ---- */
+.typing-cursor::after {
+  content: '▌';
+  animation: blink 0.7s step-end infinite;
+  color: var(--color-primary);
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ---- 页面过渡 ---- */
+.page-enter-active { transition: all 0.3s ease; }
+.page-leave-active { transition: all 0.2s ease; }
+.page-enter-from { opacity: 0; transform: translateX(10px); }
+.page-leave-to   { opacity: 0; transform: translateX(-10px); }
