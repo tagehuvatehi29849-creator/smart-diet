@@ -149,11 +149,3 @@ java -jar target/smart-diet-api-0.0.1-SNAPSHOT.jar
 
 - 对话流式接口使用 **SSE**；带图场景会调用 DashScope 多模态能力（需有效 API Key）。  
 - 工具生成的报告下载占位符须为 **`[DOWNLOAD:yyyy-MM-dd:yyyy-MM-dd]`**（英文冒号）。前端会兼容部分模型误改格式，并避免错误 Markdown 链接导致整页跳转到非法路径。  
-
-## 许可证与贡献
-
-私有/学习项目请按需补充许可证说明。欢迎通过 Issue / PR 改进文档与示例配置。
-
----
-
-**安全提示**：生产环境务必使用独立密钥文件或环境变量注入数据库密码、Redis 密码与 DashScope Key，并避免将 `application-*.yml` 中的真实密钥提交到版本库。
