@@ -1,0 +1,39 @@
+# ============================================================
+# 环境配置模板（可安全提交到 GitHub，本文件不含任何真实密钥）
+#
+# 使用步骤：
+#   1. 复制为被 gitignore 忽略的本地文件：
+#        cp application-prod.yml.example application-prod.yml
+#   2. 在 application-prod.yml 中填入你的真实密钥 / 连接信息
+#   3. application-prod.yml 已被 .gitignore 忽略，不会被提交
+# ============================================================
+
+spring:
+  ai:
+    dashscope:
+      # 通义千问（DashScope）统一 API Key：文本对话 / 多模态视觉 / Embedding 共用
+      # 复制本文件后把下面的占位值替换成你自己的 Key
+      api-key: "sk-REPLACE_WITH_YOUR_DASHSCOPE_API_KEY"
+
+  # 数据库、Redis 密码等其它敏感环境配置也可写在本文件（会覆盖 application.yml 中的同名项）
+  # datasource:
+  #   dynamic:
+  #     primary: master
+  #     datasource:
+  #       master:
+  #         url: jdbc:mysql://localhost:3306/smart_diet?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+  #         username: root
+  #         password: "REPLACE_WITH_YOUR_MYSQL_PASSWORD"
+  #       postgres:
+  #         url: jdbc:postgresql://localhost:5432/smart_diet
+  #         username: postgres
+  #         password: "REPLACE_WITH_YOUR_POSTGRES_PASSWORD"
+  # data:
+  #   redis:
+  #     password: "REPLACE_WITH_YOUR_REDIS_PASSWORD"
+
+app:
+  baidu-translate:
+    # 百度翻译（可选，翻译工具使用；不需要可留空）
+    app-id: "your_baidu_appid"
+    secret-key: "your_baidu_secret_key"
