@@ -14,8 +14,24 @@ import java.util.Map;
  */
 public class JwtUtils {
     
-    // 签名密钥（生产环境中建议把这个移到 application.yml 里动态读取，防止硬编码泄露）
-    private static final byte[] KEY = "SmartDiet_Secret_Key_2026!@#".getBytes(StandardCharsets.UTF_8);
+    // 签名密钥：从环境变量 JWT_SECRET 读取，避免硬编码泄露到代码仓库
+    private static final byte[] KEY = resolveKey();
+
+    /**
+     * 解析 JWT 签名密钥。优先读取环境变量 JWT_SECRET，其次读取系统属性 JWT_SECRET。
+     * 两者都未配置时抛出异常，强制部署前显式设置密钥，避免落到弱默认值。
+     */
+    private static byte[] resolveKey() {
+        String secret = System.getenv("JWT_SECRET");
+        if (secret == null || secret.isBlank()) {
+            secret = System.getProperty("JWT_SECRET");
+        }
+        if (secret == null || secret.isBlank()) {
+            throw new IllegalStateException(
+                    "JWT 密钥未配置：请设置环境变量 JWT_SECRET（或系统属性 -DJWT_SECRET=...）");
+        }
+        return secret.getBytes(StandardCharsets.UTF_8);
+    }
     
     // Token 过期时间：7天 (换算成毫秒)
     private static final long EXPIRE_MILLIS = 7L * 24 * 60 * 60 * 1000;
