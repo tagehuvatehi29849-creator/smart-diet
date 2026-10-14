@@ -37,7 +37,7 @@ smart-diet/
 ├── src/main/java/com/hzy/smartdiet/ # 后端源码（controller / service / config / tools …）
 ├── src/main/resources/
 │   ├── application.yml              # 公共配置（端口、context-path、MyBatis 等）
-│   ├── application-prod.yml       # 示例/环境配置（数据库、Redis、AI Key 等，勿提交真实密钥）
+│   ├── application-prod.yml.example # 环境配置模板（数据库、Redis、AI Key 占位，复制后填真实值）
 │   ├── db/schema.sql               # MySQL 建库建表脚本
 │   └── static/                     # 可选：前端构建产物（一体化部署时）
 └── frontend/                        # Vue 前端工程
@@ -64,20 +64,46 @@ smart-diet/
 
 ## 配置说明
 
-1. **主配置**：`src/main/resources/application.yml`  
-   - `server.port`：HTTP 端口（示例为 `8133`）  
-   - `server.servlet.context-path`：统一为 **`/api`**（所有 Controller 映射在 `/api` 之下）  
-   - `spring.profiles.active`：激活的环境名（如 `prod`、`local`）
+### 1. 大模型（通义千问 / DashScope）
 
-2. **环境专属**：`application-<profile>.yml`（如 `application-prod.yml`）  
-   建议在此配置（勿将含密码、API Key 的文件提交到公开仓库）：  
-   - MySQL、`postgres` 向量库 JDBC  
-   - Redis 地址与密码  
-   - `spring.ai.dashscope.api-key`（通义千问）  
-   - 可选：`app.baidu-translate`（百度翻译）  
-   - `app.rag.dataloader.enabled`：是否在启动时向 PgVector 加载知识库文档  
+模型相关配置已集中在 `src/main/resources/application.yml`：
 
-3. **前端 API 基址**：`frontend/src/api/index.js` 中 `baseURL: '/api'`。开发时由 Vite 代理到后端。
+| 用途 | 配置项 | 默认值 |
+|------|--------|--------|
+| 文本对话 | `spring.ai.dashscope.chat.options.model` | `qwen-plus`（可选 `qwen-turbo` / `qwen-plus` / `qwen-max`） |
+| 文本向量（RAG） | `spring.ai.dashscope.embedding.options.model` | `text-embedding-v2`（1536 维，与 pgvector 维度一致） |
+| 多模态视觉 | `app.ai.dashscope.vision.model` | `qwen-vl-plus`（可选 `qwen-vl-plus` / `qwen-vl-max`） |
+| 统一 API Key | `spring.ai.dashscope.api-key` | 通过环境变量 `DASHSCOPE_API_KEY` 注入 |
+
+文本与向量模型由 Spring AI Alibaba 自动装配（无需手写配置类）；多模态（视觉）走 DashScope 原生接口，地址由 `app.ai.dashscope.vision.base-url` 指定。
+
+### 2. 密钥与敏感配置（勿提交到公开仓库）
+
+真实密钥通过**环境变量**提供：
+
+| 环境变量 | 用途 | 说明 |
+|----------|------|------|
+| `DASHSCOPE_API_KEY` | 通义千问 API Key | 文本 / 视觉 / Embedding 共用 |
+| `JWT_SECRET` | JWT 签名密钥 | 签发与校验登录 Token 所用，建议 `openssl rand -base64 48` 生成，至少 32 字节 |
+
+其它敏感项（MySQL / PostgreSQL / Redis 密码、百度翻译 AppID/Secret 等）建议写入被 gitignore 忽略的环境配置文件：
+
+```bash
+cp src/main/resources/application-prod.yml.example src/main/resources/application-prod.yml
+# 在 application-prod.yml 中填入真实值（该文件已被 .gitignore 忽略，不会提交）
+```
+
+`app.rag.dataloader.enabled`：是否在启动时向 PgVector 加载知识库文档（正常运行时设为 `false`）。
+
+### 3. 主配置与环境 profile
+
+- `server.port`：HTTP 端口（示例 `8133`）
+- `server.servlet.context-path`：统一为 **`/api`**（所有 Controller 映射在 `/api` 之下）
+- `spring.profiles.active`：激活的环境名（`prod` / `local`），对应 `application-<profile>.yml`
+
+### 4. 前端 API 基址
+
+`frontend/src/api/index.js` 中 `baseURL: '/api'`，开发时由 Vite 代理到后端。
 
 ## 本地运行
 
@@ -85,10 +111,17 @@ smart-diet/
 
 ```bash
 cd smart-diet
+
+# 先注入必要的环境变量（密钥不会写进仓库）
+export DASHSCOPE_API_KEY='sk-你的通义千问key'
+export JWT_SECRET='你的JWT签名密钥'   # 例如：openssl rand -base64 48
+
 mvn spring-boot:run
 # 或指定 profile：
 # mvn spring-boot:run -Dspring-boot.run.profiles=local
 ```
+
+> 提示：`JWT_SECRET` 为必填，缺失会导致启动失败；`DASHSCOPE_API_KEY` 在调用 AI / 带图分析时需要。
 
 启动成功后（默认端口以 `application.yml` 为准）：
 
