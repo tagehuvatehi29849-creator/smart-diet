@@ -51,9 +51,13 @@ public class AgentServiceImpl implements AgentService {
     @Value("${spring.ai.dashscope.api-key}")
     private String dashscopeApiKey;
 
+    /** 多模态（视觉）模型名称，如 qwen-vl-plus / qwen-vl-max */
+    @Value("${app.ai.dashscope.vision.model:qwen-vl-plus}")
+    private String visionModel;
+
     /** DashScope 多模态生成接口地址 */
-    private static final String DASHSCOPE_VL_URL =
-            "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation";
+    @Value("${app.ai.dashscope.vision.base-url:https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation}")
+    private String visionBaseUrl;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -217,7 +221,7 @@ public class AgentServiceImpl implements AgentService {
      * @param imageValue data:image/xxx;base64,... 或外部 HTTP URL
      */
     private String callDashScopeVisionApi(String prompt, String imageValue) throws Exception {
-        // 构造请求体：{"model":"qwen-vl-plus","input":{"messages":[{"role":"user","content":[{"image":"..."},{"text":"..."}]}]}}
+        // 构造请求体：{"model":"<视觉模型>","input":{"messages":[{"role":"user","content":[{"image":"..."},{"text":"..."}]}]}}
         List<Map<String, Object>> contentList = new ArrayList<>();
 
         Map<String, Object> imagePart = new LinkedHashMap<>();
@@ -236,14 +240,14 @@ public class AgentServiceImpl implements AgentService {
         input.put("messages", List.of(message));
 
         Map<String, Object> body = new LinkedHashMap<>();
-        body.put("model", "qwen-vl-plus");
+        body.put("model", visionModel);
         body.put("input", input);
 
         String requestJson = objectMapper.writeValueAsString(body);
         log.debug("[Agent] DashScope VL 请求体（前200字符）: {}", requestJson.substring(0, Math.min(200, requestJson.length())));
 
         RestClient restClient = RestClient.builder()
-                .baseUrl(DASHSCOPE_VL_URL)
+                .baseUrl(visionBaseUrl)
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + dashscopeApiKey)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();

@@ -6,6 +6,22 @@ spring:
   # 手动排除 PgVector 自动配置，由 PgVectorStoreConfig 手动注册 Bean
   autoconfigure:
     exclude: org.springframework.ai.autoconfigure.vectorstore.pgvector.PgVectorStoreAutoConfiguration
+  # ==========================================
+  # 通义千问（DashScope）大模型配置
+  # ==========================================
+  ai:
+    dashscope:
+      # 阿里云百炼 / DashScope API Key（勿提交真实密钥，建议通过环境变量 DASHSCOPE_API_KEY 注入）
+      api-key: ${DASHSCOPE_API_KEY:}
+      # 文本对话模型（纯文字聊天 / 饮食文本分析）
+      chat:
+        options:
+          model: qwen-plus              # 可选：qwen-turbo / qwen-plus / qwen-max
+          temperature: 0.7
+      # 文本向量（Embedding）模型，用于 RAG 召回（text-embedding-v2 为 1536 维，与 pgvector 维度一致）
+      embedding:
+        options:
+          model: text-embedding-v2
   # Redis 配置（连接参数、密码等在 local profile 中覆盖）
   data:
     redis:
@@ -77,6 +93,14 @@ app:
     dataloader:
       # true = 首次启动时向 PgVector 加载知识库；正常运行时设为 false
       enabled: false
+  # 通义千问多模态（视觉）模型配置
+  ai:
+    dashscope:
+      vision:
+        # 视觉模型名称（用于带图片的对话 / 饮食图片分析）
+        model: qwen-vl-plus          # 可选：qwen-vl-plus / qwen-vl-max
+        # DashScope 多模态生成接口地址
+        base-url: https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation
   chat:
     context:
       # 保留最近 N 轮对话（1轮 = 1条 user + 1条 assistant）
